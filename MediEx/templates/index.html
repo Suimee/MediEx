@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MediEx - Symptom Based Diagnosis Expert System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap top-inner">
+      <div class="brand"><span class="logo" aria-hidden="true">+</span> MediExpert</div>
+      <nav>
+        <a href="#checker">Checker</a>
+        <a href="#how">How it works</a>
+        <a href="#about">About</a>
+      </nav>
+    </div>
+  </header>
+
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>Rule-based symptom checker</h1>
+      <p>Choose your symptoms, add a little medical history, and the expert system ranks the most
+         likely diseases and shows <strong>why</strong> it reached each result.</p>
+    </section>
+
+    {% if load_error %}
+      <div class="error-box">{{ load_error }}</div>
+    {% endif %}
+
+    <section id="checker" class="grid">
+      <form id="form" class="card" autocomplete="off" novalidate>
+        <h2>1. Your symptoms</h2>
+        <label for="symInput" class="sr">Search symptoms</label>
+        <div class="search">
+          <input id="symInput" type="text" placeholder="Type a symptom, e.g. fever, headache, itching"
+                 role="combobox" aria-expanded="false" aria-controls="suggest" aria-autocomplete="list">
+          <ul id="suggest" class="suggest" role="listbox" hidden></ul>
+        </div>
+        <div id="chips" class="chips" aria-live="polite"></div>
+        <p id="chipHint" class="hint">No symptoms selected yet.</p>
+
+        <h2>2. About you <span class="opt">(optional)</span></h2>
+        <label for="age">Age</label>
+        <input id="age" type="number" min="1" max="119" placeholder="e.g. 30" class="age">
+
+        <fieldset>
+          <legend>Medical history / risk factors</legend>
+          <div id="history" class="checks"></div>
+        </fieldset>
+
+        <div class="actions">
+          <button type="submit" id="go" class="btn primary">Find possible diseases</button>
+          <button type="button" id="reset" class="btn">Clear all</button>
+        </div>
+        <p id="formError" class="form-error" role="alert" hidden></p>
+      </form>
+
+      <section class="card" id="resultsCard" aria-live="polite">
+        <h2>Results</h2>
+        <div id="empty" class="empty">
+          Your ranked results will appear here.
+        </div>
+        <div id="loading" class="empty" hidden>Analysing symptoms...</div>
+        <div id="results"></div>
+        <div id="followBox" class="follow" hidden>
+          <h3>Refine the result</h3>
+          <p class="hint">Do you also have any of these? Click to add and re-run.</p>
+          <div id="follow" class="chips"></div>
+        </div>
+      </section>
+    </section>
+
+    <section id="how" class="card section">
+      <h2>How it works</h2>
+      <ol class="steps">
+        <li><strong>Knowledge acquisition.</strong> IF-THEN rules for each disease are derived from a labelled
+            disease-symptom dataset.</li>
+        <li><strong>Inference engine.</strong> Forward chaining: a rule fires when its symptoms are observed.
+            Certainty combines how much of the disease is explained and how much of your input is explained.</li>
+        <li><strong>History rules.</strong> Age and risk factors add small boosts, only to diseases that already
+            match your symptoms.</li>
+        <li><strong>Explanation facility.</strong> Every result shows the rule that fired, matched and missing symptoms,
+            and any history adjustments.</li>
+        <li><strong>Follow-up questions.</strong> The system suggests symptoms that best separate the top candidates.</li>
+      </ol>
+    </section>
+
+    <section id="about" class="card section">
+      <h2>About &amp; limits</h2>
+      <div id="metrics" class="metrics" aria-live="polite"></div>
+      <p class="hint">
+        The dataset is largely synthetic with many near-duplicate rows, so high accuracy does not prove
+        real clinical performance. Rare diseases, symptom severity over time, lab results and physical
+        examination are not modelled. Nothing you enter is stored by this site.
+      </p>
+    </section>
+  </main>
+
+
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
